@@ -29,9 +29,11 @@ export async function signIn(req, res) {
 
 export async function signUp(req, res) {
   const { name, email, password } = req.body;
-  const isuser = await connection.query("SELECT * users WHERE email=$1", [
+  console.log("tudo validado");
+  const isuser = await connection.query("SELECT * FROM users WHERE email=$1", [
     email,
   ]);
+  console.log("achei oq eu queria");
   if (isuser.rows.length !== 0) {
     return res.status(403).send({ message: "email ja cadastrado" });
   }
