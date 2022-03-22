@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
-import connection from "../database.js";
-import { urlsRepository } from "../repositories/urlsRepository.js";
+import connection from "../database/database.js";
+import { createUser } from "../repositores/urlsRepository.js";
 
-export async function login(req, res) {
+export async function signIn(req, res) {
   const { email, password } = req.body;
 
   const { rows: users } = await connection.query(
@@ -38,7 +38,7 @@ export async function signUp(req, res) {
 
   const passwordHash = bcrypt.hashSync(password, 10);
 
-  await urlsRepository.createUser(name, email, passwordHash);
+  await createUser(name, email, passwordHash);
 
   res.status(201).send();
 }
