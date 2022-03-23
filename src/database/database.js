@@ -11,5 +11,4 @@ const databaseConfig = {
 };
 
 const connection = new Pool(databaseConfig);
-console.log(connection);
 export default connection;
