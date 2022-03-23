@@ -18,4 +18,17 @@ async function getHashtagsWithLimit() {
         `
     );
 }
-export { createHashtag, getHashtagsWithLimit };
+
+async function getPostsWithHashtagName(hashtag) {
+    return connection.query(
+        `
+            SELECT p.*, hp."hashtagId", h."name" FROM posts p
+                JOIN "hashtagsPosts" hp ON hp."postId"=p.id
+                JOIN hashtags h ON h.id=hp."hashtagId"
+                WHERE h.name=$1
+        `,
+        [hashtag]
+    );
+}
+
+export { createHashtag, getHashtagsWithLimit, getPostsWithHashtagName };

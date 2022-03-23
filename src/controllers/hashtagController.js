@@ -1,6 +1,7 @@
 import {
     createHashtag,
     getHashtagsWithLimit,
+    getPostsWithHashtagName,
 } from "../repositories/hashtagsRepository.js";
 
 async function postHashtag(req, res) {
@@ -24,4 +25,15 @@ async function getHashtags(req, res) {
     }
 }
 
-export { postHashtag, getHashtags };
+async function getPostsWithHashtag(req, res) {
+    const hashtag = req.params.hashtag;
+    try {
+        const result = await getPostsWithHashtagName(hashtag);
+        return res.status(200).send(result.rows);
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+}
+
+export { postHashtag, getHashtags, getPostsWithHashtag };
