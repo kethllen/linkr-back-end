@@ -2,8 +2,8 @@ import joi from 'joi';
 
 const postSchema = joi.object(
     {
-        url: joi.string().required(),
-        text: joi.string()
+        link: joi.string().required(),
+        text: joi.string().allow(null, '')
     }
 )
 
