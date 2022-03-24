@@ -6,15 +6,13 @@ import {
   checkUserSession,
   createSession,
   updateSession,
+  checkEmailExist,
 } from "../repositories/urlsRepository.js";
 
 export async function signIn(req, res) {
   const { email, password } = req.body;
 
-  const { rows: users } = await connection.query(
-    "SELECT * FROM users WHERE email=$1",
-    [email]
-  );
+  const { rows: users } = await checkEmailExist(email);
   const [user] = users;
   if (!user) {
     return res.sendStatus(401);
@@ -38,9 +36,7 @@ export async function signIn(req, res) {
 export async function signUp(req, res) {
   const { name, email, password, image } = req.body;
 
-  const isuser = await connection.query("SELECT * FROM users WHERE email=$1", [
-    email,
-  ]);
+  const isuser = await checkEmailExist(email);
 
   if (isuser.rows.length !== 0) {
     return res.status(409).send("used email");
