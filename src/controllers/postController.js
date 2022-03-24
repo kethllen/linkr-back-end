@@ -1,4 +1,3 @@
-import connection from "../database/database.js";
 import urlMetadata from "url-metadata";
 import {
   checkLinkExists,
