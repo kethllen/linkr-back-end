@@ -1,7 +1,12 @@
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 import connection from "../database/database.js";
-import { createUser } from "../repositories/urlsRepository.js";
+import {
+  createUser,
+  checkUserSession,
+  createSession,
+  updateSession,
+} from "../repositories/urlsRepository.js";
 
 export async function signIn(req, res) {
   const { email, password } = req.body;
@@ -17,10 +22,13 @@ export async function signIn(req, res) {
 
   if (bcrypt.compareSync(password, user.password)) {
     const token = uuid();
-    await connection.query(
-      'INSERT INTO sessions (token, "userId") VALUES ($1, $2)',
-      [token, user.id]
-    );
+    const checkUser = await checkUserSession(user.id);
+
+    if (checkUser.rows.length > 0) {
+      await updateSession(token, user.id);
+    } else {
+      await createSession(token, user.id);
+    }
     return res.send(token);
   }
 
