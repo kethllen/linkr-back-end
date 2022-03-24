@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
-import connection from "../database/database.js";
 import {
   createUser,
   checkUserSession,
@@ -27,6 +26,7 @@ export async function signIn(req, res) {
     } else {
       await createSession(token, user.id);
     }
+
     return res.send(token);
   }
 
