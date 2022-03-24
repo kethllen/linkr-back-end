@@ -15,6 +15,7 @@ export async function signIn(req, res) {
     "SELECT * FROM users WHERE email=$1",
     [email]
   );
+
   const [user] = users;
   if (!user) {
     return res.sendStatus(401);
@@ -29,6 +30,7 @@ export async function signIn(req, res) {
     } else {
       await createSession(token, user.id);
     }
+
     return res.send(token);
   }
 
