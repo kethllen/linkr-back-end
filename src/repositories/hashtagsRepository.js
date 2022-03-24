@@ -13,7 +13,10 @@ async function createHashtag(name) {
 async function getHashtagsWithLimit() {
     return connection.query(
         `
-        SELECT * FROM hashtags
+        SELECT h.name, h.id, COUNT(hp."hashtagId") AS count FROM hashtags h
+            JOIN "hashtagsPosts" hp ON hp."hashtagId"=h.id
+            GROUP BY h.name,h.id
+            ORDER BY count DESC
             LIMIT 10
         `
     );
