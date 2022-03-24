@@ -31,4 +31,13 @@ async function checkUserSession(userId) {
     [userId]
   );
 }
-export { createUser, checkUserSession, createSession, updateSession };
+async function checkEmailExist(email) {
+  return connection.query("SELECT * FROM users WHERE email=$1", [email]);
+}
+export {
+  createUser,
+  checkUserSession,
+  createSession,
+  updateSession,
+  checkEmailExist,
+};
