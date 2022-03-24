@@ -43,7 +43,7 @@ export async function signUp(req, res) {
   ]);
 
   if (isuser.rows.length !== 0) {
-    return res.status(403).send({ message: "email ja cadastrado" });
+    return res.status(409).send("used email");
   }
 
   const passwordHash = bcrypt.hashSync(password, 10);
