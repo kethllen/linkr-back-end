@@ -20,7 +20,7 @@ export async function getSingleUser(req, res) {
     const { token } = res.locals;
 
     const user = await connection.query(`
-      SELECT u.name, u.image FROM users u
+      SELECT u.id, u.name, u.image FROM users u
       JOIN sessions s
       ON s."userId" = u.id
       WHERE s.token = $1`, [token]);
