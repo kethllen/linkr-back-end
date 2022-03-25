@@ -56,6 +56,7 @@ async function selectPosts() {
       SELECT
           posts.id,
           posts.text,
+          posts."userId" as "userId",
           users.name,
           users.image,
           links.url,
