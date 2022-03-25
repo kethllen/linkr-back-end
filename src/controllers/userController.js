@@ -25,8 +25,6 @@ export async function getSingleUser(req, res) {
       ON s."userId" = u.id
       WHERE s.token = $1`, [token]);
 
-      console.log('aqui', user.rows[0])
-
     return res.status(200).send(user.rows[0]);
 
   } catch (error) {
