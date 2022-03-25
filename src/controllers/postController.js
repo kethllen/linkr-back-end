@@ -114,4 +114,4 @@ export async function deletePost(req, res) {
   } catch (error) {
     return res.sendStatus(500);
   }
-}
+};
