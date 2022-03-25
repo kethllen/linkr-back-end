@@ -32,7 +32,12 @@ async function checkUserSession(userId) {
   );
 }
 async function checkEmailExist(email) {
-  return connection.query("SELECT * FROM users WHERE email=$1", [email]);
+  return connection.query(
+    `SELECT * FROM users 
+      WHERE email = $1
+    `,
+    [email]
+  );
 }
 export {
   createUser,
