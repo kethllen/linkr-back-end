@@ -110,7 +110,7 @@ export async function deletePost(req, res) {
 
     await removePost(postId);
 
-    return res.status(200);
+    return res.sendStatus(200);
   } catch (error) {
     return res.sendStatus(500);
   }
