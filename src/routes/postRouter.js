@@ -16,7 +16,7 @@ postRouter.post(
   validaTokenMiddleware,
   publishPost
 );
-postRouter.get("/posts", getPosts);
+postRouter.get("/posts", validaTokenMiddleware, getPosts);
 postRouter.delete("/posts/:postId", validaTokenMiddleware, deletePost);
 postRouter.put(
   "/posts/:postId",

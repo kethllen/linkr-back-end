@@ -11,10 +11,7 @@ import {
 export async function signIn(req, res) {
   try {
     const { email, password } = req.body;
-    console.log("oi");
     const { rows: users } = await checkEmailExist(email);
-    console.log("oi de novo");
-    console.log(users);
     const [user] = users;
     if (!user) {
       return res.sendStatus(401);

@@ -1,7 +1,7 @@
 import connection from "../database/database.js";
 
 async function selectLikes() {
-  return connection.query(
+  return await connection.query(
     `
         SELECT * 
         FROM likes
@@ -10,7 +10,7 @@ async function selectLikes() {
 };
 
 async function searchIfUserLiked(userId, postId) {
-  return connection.query(
+  return await connection.query(
     `
         SELECT * 
         FROM likes
@@ -20,7 +20,7 @@ async function searchIfUserLiked(userId, postId) {
 };
 
 async function insertLike(userId, postId) {
-  return connection.query(
+  return await connection.query(
     `
         INSERT INTO likes 
         ("userId", "postId") 
@@ -31,7 +31,7 @@ async function insertLike(userId, postId) {
 
 async function removeLike(id, postId) {
    
-  return connection.query(
+  return await connection.query(
     `
         DELETE FROM likes
         WHERE "userId"=$1 AND "postId"=$2`,
