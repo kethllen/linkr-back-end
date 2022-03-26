@@ -4,9 +4,29 @@ async function createHashtag(name) {
     return connection.query(
         `
             INSERT INTO hashtags(name)
-            VALUES ($1)        
-            `,
+                VALUES ($1)        
+        `,
         [name]
+    );
+}
+
+async function connectHashtagWithPost(hashtagId, postId) {
+    return connection.query(
+        `
+            INSERT INTO "hashtagsPosts"("hashtagId","postId")
+                VALUES ($1,$2)
+        `,
+        [hashtagId, postId]
+    );
+}
+
+async function getHashtagByName(hashtagName) {
+    return connection.query(
+        `
+            SELECT * FROM hashtags h
+                WHERE h.name=$1
+        `,
+        [hashtagName]
     );
 }
 
@@ -50,4 +70,10 @@ async function getPostsWithHashtagName(hashtag) {
     );
 }
 
-export { createHashtag, getHashtagsWithLimit, getPostsWithHashtagName };
+export {
+    createHashtag,
+    getHashtagsWithLimit,
+    getPostsWithHashtagName,
+    connectHashtagWithPost,
+    getHashtagByName,
+};
