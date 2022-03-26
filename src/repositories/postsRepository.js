@@ -37,23 +37,23 @@ async function updateLink(title, description, image, url) {
                 description = $2, 
                 image = $3
             WHERE url=$4`,
-        [title, description, image, url]
-    );
-}
+    [title, description, image, url]
+  );
+};
 
 async function createPost(userId, text, linkId) {
     return connection.query(
         `
           INSERT INTO posts ("userId",text,"linkId") 
           VALUES ($1, $2, $3)`,
-        [userId, text, linkId]
-    );
-}
+    [userId, text, linkId]
+  );
+};
 
 async function selectPosts() {
-    return connection.query(
-        `
-      SELECT
+  return connection.query(
+    `
+    SELECT 
           posts.id,
           posts.text,
           posts."userId" as "userId",
@@ -62,15 +62,28 @@ async function selectPosts() {
           links.url,
           links.title,
           links.description,
-          links.image as "linkImage"
+          links.image as "linkImage",
+          COUNT(likes."userId") AS "likeQuantity"
       FROM posts
       JOIN users ON users.id=posts."userId"
       JOIN links ON links.id=posts."linkId"
+      LEFT JOIN likes ON posts.id=likes."postId"
+      GROUP BY 
+          posts.id, 
+          users.name, 
+          users.image, 
+          links.url, 
+          links.title,
+          links.description,
+          links.image,
+          likes."postId"
       ORDER BY id DESC
       LIMIT 20
     `
-    );
-}
+  );
+};
+
+
 async function checkPostExists(postId) {
     return connection.query(
         `
@@ -80,6 +93,7 @@ async function checkPostExists(postId) {
         [postId]
     );
 }
+
 async function updatePost(text, linkId, postId) {
     return connection.query(
         `
