@@ -11,6 +11,8 @@ import {
     removePost,
 } from "../repositories/postsRepository.js";
 
+import { selectLikes, searchIfUserLiked } from "../repositories/likesRepository.js";
+
 export async function publishPost(req, res) {
     try {
         const { user } = res.locals;
@@ -42,10 +44,20 @@ export async function publishPost(req, res) {
 }
 
 export async function getPosts(req, res) {
-    try {
-        const posts = await selectPosts();
+    
+    const { id } = res.locals.user;
+    const arrayComPostsNovos = [];
 
-        return res.status(200).send(posts.rows);
+    try {
+        const {rows: posts} = await selectPosts();
+
+        for (let i = 0; i < posts.length; i++) {
+            const response = await searchIfUserLiked(id, posts[i].id);
+            const postWithIsLiked = {...posts[i], "isLiked": Boolean(response.rowCount > 0)}
+            arrayComPostsNovos.push(postWithIsLiked);
+        }
+        
+        return res.status(200).send(arrayComPostsNovos);
     } catch (error) {
         return res.sendStatus(500);
     }
