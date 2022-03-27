@@ -52,13 +52,13 @@ export async function publishPost(req, res) {
 export async function getPosts(req, res) {
     const { id } = res.locals.user;
 
-    try {
-        const { rows: posts } = await selectPosts(id);
+    // try {
+    const { rows: posts } = await selectPosts(id);
 
-        return res.status(200).send(posts);
-    } catch (error) {
-        return res.sendStatus(500);
-    }
+    return res.status(200).send(posts);
+    // } catch (error) {
+    //     return res.sendStatus(500);
+    // }
 }
 
 export async function editPost(req, res) {
