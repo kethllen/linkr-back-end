@@ -65,11 +65,22 @@ export async function getPostsById(req, res) {
             links.url,
             links.title,
             links.description,
-            links.image as "linkImage"
+            links.image as "linkImage",
+            COUNT(likes."userId") AS "likeQuantity"
         FROM posts
         JOIN users ON users.id=posts."userId"
         JOIN links ON links.id=posts."linkId"
+        LEFT JOIN likes ON posts.id=likes."postId"
         WHERE posts."userId"=$1
+        GROUP BY 
+          posts.id, 
+          users.name, 
+          users.image, 
+          links.url, 
+          links.title,
+          links.description,
+          links.image,
+          likes."postId"
         ORDER BY id DESC
         LIMIT 20
       `,
