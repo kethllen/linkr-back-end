@@ -11,7 +11,7 @@ import {
     removePost,
 } from "../repositories/postsRepository.js";
 
-import { selectLikes, searchIfUserLiked } from "../repositories/likesRepository.js";
+import { selectOnlyTwoLikes, searchIfUserLiked } from "../repositories/likesRepository.js";
 
 export async function publishPost(req, res) {
     try {
@@ -46,19 +46,22 @@ export async function publishPost(req, res) {
 export async function getPosts(req, res) {
     
     const { id } = res.locals.user;
-    const arrayComPostsNovos = [];
+    let arrayComPostsNovos = [];
 
     try {
         const {rows: posts} = await selectPosts();
 
         for (let i = 0; i < posts.length; i++) {
             const response = await searchIfUserLiked(id, posts[i].id);
-            const postWithIsLiked = {...posts[i], "isLiked": Boolean(response.rowCount > 0)}
-            arrayComPostsNovos.push(postWithIsLiked);
-        }
+            const value = Boolean(response.rowCount > 0)
+            const {rows: userLiked} = await selectOnlyTwoLikes(posts[i].id)
+            const postWithIsLiked = {...posts[i], "isLiked": value, userLiked}
+            arrayComPostsNovos = [...arrayComPostsNovos, postWithIsLiked]            
+        };
         
         return res.status(200).send(arrayComPostsNovos);
     } catch (error) {
+        console.log(error)
         return res.sendStatus(500);
     }
 }
