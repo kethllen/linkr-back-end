@@ -9,6 +9,20 @@ async function selectLikes() {
   );
 };
 
+async function selectOnlyTwoLikes(postId) {
+  return await connection.query(
+    `
+        SELECT 
+          users.name
+          FROM likes
+          JOIN posts ON posts.id = likes."postId"
+          JOIN users ON users.id = likes."userId"
+          WHERE posts.id = $1
+          LIMIT 2
+    `,[postId]
+  );
+};
+
 async function searchIfUserLiked(userId, postId) {
   return await connection.query(
     `
@@ -43,5 +57,6 @@ export {
   selectLikes,
   insertLike,
   removeLike,
-  searchIfUserLiked
+  searchIfUserLiked,
+  selectOnlyTwoLikes
 };

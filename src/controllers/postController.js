@@ -13,6 +13,7 @@ import {
     removePostFromLikes
 } from "../repositories/postsRepository.js";
 
+
 import {
     createHashtag,
     getHashtagByName,
@@ -57,6 +58,7 @@ export async function getPosts(req, res) {
 
         return res.status(200).send(posts);
     } catch (error) {
+        console.log(error)
         return res.sendStatus(500);
     }
 }
