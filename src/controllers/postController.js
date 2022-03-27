@@ -19,8 +19,6 @@ import {
     connectHashtagWithPost,
 } from "../repositories/hashtagsRepository.js";
 
-import { searchIfUserLiked } from "../repositories/likesRepository.js";
-
 export async function publishPost(req, res) {
     try {
         const { user } = res.locals;
@@ -52,20 +50,12 @@ export async function publishPost(req, res) {
 }
 
 export async function getPosts(req, res) {
-
     const { id } = res.locals.user;
-    const arrayComPostsNovos = [];
 
     try {
-        const { rows: posts } = await selectPosts();
+        const { rows: posts } = await selectPosts(id);
 
-        for (let i = 0; i < posts.length; i++) {
-            const response = await searchIfUserLiked(id, posts[i].id);
-            const postWithIsLiked = { ...posts[i], "isLiked": Boolean(response.rowCount > 0) }
-            arrayComPostsNovos.push(postWithIsLiked);
-        }
-
-        return res.status(200).send(arrayComPostsNovos);
+        return res.status(200).send(posts);
     } catch (error) {
         return res.sendStatus(500);
     }

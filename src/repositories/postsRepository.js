@@ -50,36 +50,40 @@ async function createPost(userId, text, linkId) {
     );
 };
 
-async function selectPosts() {
+async function selectPosts(userId) {
     return connection.query(
         `
-    SELECT 
-          posts.id,
-          posts.text,
-          posts."userId" as "userId",
-          users.name,
-          users.image,
-          links.url,
-          links.title,
-          links.description,
-          links.image as "linkImage",
-          COUNT(likes."userId") AS "likeQuantity"
-      FROM posts
-      JOIN users ON users.id=posts."userId"
-      JOIN links ON links.id=posts."linkId"
-      LEFT JOIN likes ON posts.id=likes."postId"
-      GROUP BY 
-          posts.id, 
-          users.name, 
-          users.image, 
-          links.url, 
-          links.title,
-          links.description,
-          links.image,
-          likes."postId"
-      ORDER BY id DESC
-      LIMIT 20
-    `
+        SELECT
+            posts.id,
+            posts.text,
+            posts."userId" as "userId",
+            users.name,
+            users.image,
+            links.url,
+            links.title,
+            links.description,
+            links.image as "linkImage",
+            COUNT(likes."userId") AS "likeQuantity",
+            bool_and(CASE WHEN likes."userId"=$1 THEN true ELSE null END) AS "isLiked"
+
+        FROM posts
+        JOIN users ON users.id=posts."userId"
+        JOIN links ON links.id=posts."linkId"
+        LEFT JOIN likes ON posts.id=likes."postId"
+
+        GROUP BY
+            posts.id,
+            users.name,
+            users.image,
+            links.url,
+            links.title,
+            links.description,
+            links.image,
+            likes."postId"
+
+        ORDER BY id DESC
+        LIMIT 20
+        `, [userId]
     );
 };
 
