@@ -42,7 +42,7 @@ async function getHashtagsWithLimit() {
     );
 }
 
-async function getPostsWithHashtagName(hashtag) {
+async function getPostsWithHashtagName(postId, hashtag) {
     return connection.query(
         `
             SELECT
@@ -57,14 +57,17 @@ async function getPostsWithHashtagName(hashtag) {
                 links.image as "linkImage",
                 hp."hashtagId", 
                 h."name" AS "hashtagName",
-                COUNT(likes."userId") AS "likeQuantity"
+                COUNT(likes."userId") AS "likeQuantity",
+                bool_and(CASE WHEN likes."userId"=$1 THEN true ELSE null END) AS "isLiked"
+
             FROM posts p
             JOIN users ON users.id=p."userId"
             JOIN links ON links.id=p."linkId"
             JOIN "hashtagsPosts" hp ON hp."postId"=p.id
             JOIN hashtags h ON h.id=hp."hashtagId"
             LEFT JOIN likes ON p.id=likes."postId"
-            WHERE h.name=$1
+
+            WHERE h.name=$2
             GROUP BY 
                 p.id, 
                 users.name, 
@@ -79,7 +82,7 @@ async function getPostsWithHashtagName(hashtag) {
             ORDER BY id DESC
             LIMIT 20
         `,
-        [hashtag]
+        [postId, hashtag]
     );
 }
 
