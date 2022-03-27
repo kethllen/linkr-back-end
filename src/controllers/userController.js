@@ -53,7 +53,9 @@ export async function getUserById(req, res) {
 
 export async function getPostsById(req, res) {
   try {
+    const { user } = res.locals;
     const { id } = req.params;
+
     const posts = await connection.query(
       `
         SELECT
@@ -66,12 +68,15 @@ export async function getPostsById(req, res) {
             links.title,
             links.description,
             links.image as "linkImage",
-            COUNT(likes."userId") AS "likeQuantity"
+            COUNT(likes."userId") AS "likeQuantity",
+            bool_and(CASE WHEN likes."userId"=$1 THEN true ELSE null END) AS "isLiked"
+
         FROM posts
         JOIN users ON users.id=posts."userId"
         JOIN links ON links.id=posts."linkId"
         LEFT JOIN likes ON posts.id=likes."postId"
-        WHERE posts."userId"=$1
+
+        WHERE posts."userId"=$2
         GROUP BY 
           posts.id, 
           users.name, 
@@ -81,10 +86,11 @@ export async function getPostsById(req, res) {
           links.description,
           links.image,
           likes."postId"
+
         ORDER BY id DESC
         LIMIT 20
       `,
-      [id]
+      [user.id, id]
     );
     return res.status(200).send(posts.rows);
   } catch (error) {
