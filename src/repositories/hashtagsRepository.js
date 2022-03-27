@@ -56,13 +56,26 @@ async function getPostsWithHashtagName(hashtag) {
                 links.description,
                 links.image as "linkImage",
                 hp."hashtagId", 
-                h."name" AS "hashtagName"
+                h."name" AS "hashtagName",
+                COUNT(likes."userId") AS "likeQuantity"
             FROM posts p
             JOIN users ON users.id=p."userId"
             JOIN links ON links.id=p."linkId"
             JOIN "hashtagsPosts" hp ON hp."postId"=p.id
             JOIN hashtags h ON h.id=hp."hashtagId"
+            LEFT JOIN likes ON p.id=likes."postId"
             WHERE h.name=$1
+            GROUP BY 
+                p.id, 
+                users.name, 
+                users.image, 
+                links.url, 
+                links.title,
+                links.description,
+                links.image,
+                likes."postId",
+                hp."hashtagId", 
+                h."name"
             ORDER BY id DESC
             LIMIT 20
         `,

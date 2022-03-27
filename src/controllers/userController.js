@@ -36,7 +36,6 @@ export async function getSingleUser(req, res) {
 export async function getUserById(req, res) {
   try {
     const { id } = req.params;
-    console.log("to no by id " + id);
     const user = await connection.query(
       `
         SELECT
@@ -46,7 +45,6 @@ export async function getUserById(req, res) {
       `,
       [id]
     );
-    console.log(user.rows[0]);
     return res.status(200).send(user.rows[0]);
   } catch (error) {
     return res.sendStatus(500);
@@ -55,7 +53,6 @@ export async function getUserById(req, res) {
 
 export async function getPostsById(req, res) {
   try {
-    console.log("oi");
     const { id } = req.params;
     const posts = await connection.query(
       `
@@ -68,17 +65,27 @@ export async function getPostsById(req, res) {
             links.url,
             links.title,
             links.description,
-            links.image as "linkImage"
+            links.image as "linkImage",
+            COUNT(likes."userId") AS "likeQuantity"
         FROM posts
         JOIN users ON users.id=posts."userId"
         JOIN links ON links.id=posts."linkId"
+        LEFT JOIN likes ON posts.id=likes."postId"
         WHERE posts."userId"=$1
+        GROUP BY 
+          posts.id, 
+          users.name, 
+          users.image, 
+          links.url, 
+          links.title,
+          links.description,
+          links.image,
+          likes."postId"
         ORDER BY id DESC
         LIMIT 20
       `,
       [id]
     );
-    console.log(posts.rows);
     return res.status(200).send(posts.rows);
   } catch (error) {
     return res.sendStatus(500);
