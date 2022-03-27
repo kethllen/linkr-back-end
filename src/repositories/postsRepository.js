@@ -71,7 +71,7 @@ async function selectPosts(userId) {
         JOIN users ON users.id=posts."userId"
         JOIN links ON links.id=posts."linkId"
         LEFT JOIN likes ON posts.id=likes."postId"
-        JOIN users as u ON likes."userId"=u.id
+        LEFT JOIN users as u ON likes."userId"=u.id
 
         GROUP BY
             posts.id,

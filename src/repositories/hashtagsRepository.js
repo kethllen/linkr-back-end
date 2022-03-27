@@ -67,7 +67,7 @@ async function getPostsWithHashtagName(postId, hashtag) {
             JOIN "hashtagsPosts" hp ON hp."postId"=p.id
             JOIN hashtags h ON h.id=hp."hashtagId"
             LEFT JOIN likes ON p.id=likes."postId"
-            JOIN users as u ON likes."userId"=u.id
+            LEFT JOIN users as u ON likes."userId"=u.id
 
             WHERE h.name=$2
             GROUP BY 

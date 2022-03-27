@@ -19,6 +19,7 @@ import {
     getHashtagByName,
     connectHashtagWithPost,
 } from "../repositories/hashtagsRepository.js";
+import connection from "../database/database.js";
 
 export async function publishPost(req, res) {
     try {
