@@ -70,7 +70,7 @@ export async function getPostsById(req, res) {
             links.image as "linkImage",
             COUNT(likes."userId") AS "likeQuantity",
             bool_and(CASE WHEN likes."userId"=$1 THEN true ELSE null END) AS "isLiked",
-            ARRAY_AGG(u."name") AS "userLiked"
+            (ARRAY_AGG(u."name"))[1:2] AS "userLiked"
 
         FROM posts
         JOIN users ON users.id=posts."userId"
