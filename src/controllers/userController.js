@@ -36,7 +36,6 @@ export async function getSingleUser(req, res) {
 export async function getUserById(req, res) {
   try {
     const { id } = req.params;
-    console.log("to no by id " + id);
     const user = await connection.query(
       `
         SELECT
@@ -46,7 +45,6 @@ export async function getUserById(req, res) {
       `,
       [id]
     );
-    console.log(user.rows[0]);
     return res.status(200).send(user.rows[0]);
   } catch (error) {
     return res.sendStatus(500);
@@ -55,7 +53,6 @@ export async function getUserById(req, res) {
 
 export async function getPostsById(req, res) {
   try {
-    console.log("oi");
     const { id } = req.params;
     const posts = await connection.query(
       `
@@ -78,7 +75,6 @@ export async function getPostsById(req, res) {
       `,
       [id]
     );
-    console.log(posts.rows);
     return res.status(200).send(posts.rows);
   } catch (error) {
     return res.sendStatus(500);

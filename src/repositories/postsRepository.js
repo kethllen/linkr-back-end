@@ -37,8 +37,8 @@ async function updateLink(title, description, image, url) {
                 description = $2, 
                 image = $3
             WHERE url=$4`,
-    [title, description, image, url]
-  );
+        [title, description, image, url]
+    );
 };
 
 async function createPost(userId, text, linkId) {
@@ -46,13 +46,13 @@ async function createPost(userId, text, linkId) {
         `
           INSERT INTO posts ("userId",text,"linkId") 
           VALUES ($1, $2, $3)`,
-    [userId, text, linkId]
-  );
+        [userId, text, linkId]
+    );
 };
 
 async function selectPosts() {
-  return connection.query(
-    `
+    return connection.query(
+        `
     SELECT 
           posts.id,
           posts.text,
@@ -80,7 +80,7 @@ async function selectPosts() {
       ORDER BY id DESC
       LIMIT 20
     `
-  );
+    );
 };
 
 
@@ -102,6 +102,24 @@ async function updatePost(text, linkId, postId) {
               "linkId"=$2
           WHERE id=$3`,
         [text, linkId, postId]
+    );
+}
+
+async function removePostFromHashtagsPosts(postId) {
+    return connection.query(
+        `
+          DELETE FROM "hashtagsPosts"
+          WHERE "postId"=$1`,
+        [postId]
+    );
+}
+
+async function removePostFromLikes(postId) {
+    return connection.query(
+        `
+          DELETE FROM likes
+          WHERE "postId"=$1`,
+        [postId]
     );
 }
 
@@ -137,4 +155,6 @@ export {
     updatePost,
     removePost,
     getPostsByUserId,
+    removePostFromHashtagsPosts,
+    removePostFromLikes
 };
