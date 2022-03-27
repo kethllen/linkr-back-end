@@ -44,9 +44,10 @@ async function getHashtags(req, res) {
 }
 
 async function getPostsWithHashtag(req, res) {
+    const { id } = res.locals.user;
     const hashtag = req.params.hashtag;
     try {
-        const result = await getPostsWithHashtagName(hashtag);
+        const result = await getPostsWithHashtagName(id, hashtag);
         return res.status(200).send(result.rows);
     } catch (error) {
         console.log(error);
