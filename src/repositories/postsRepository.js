@@ -37,8 +37,8 @@ async function updateLink(title, description, image, url) {
                 description = $2, 
                 image = $3
             WHERE url=$4`,
-    [title, description, image, url]
-  );
+        [title, description, image, url]
+    );
 };
 
 async function createPost(userId, text, linkId) {
@@ -46,41 +46,47 @@ async function createPost(userId, text, linkId) {
         `
           INSERT INTO posts ("userId",text,"linkId") 
           VALUES ($1, $2, $3)`,
-    [userId, text, linkId]
-  );
+        [userId, text, linkId]
+    );
 };
 
-async function selectPosts() {
-  return connection.query(
-    `
-    SELECT 
-          posts.id,
-          posts.text,
-          posts."userId" as "userId",
-          users.name,
-          users.image,
-          links.url,
-          links.title,
-          links.description,
-          links.image as "linkImage",
-          COUNT(likes."userId") AS "likeQuantity"
-      FROM posts
-      JOIN users ON users.id=posts."userId"
-      JOIN links ON links.id=posts."linkId"
-      LEFT JOIN likes ON posts.id=likes."postId"
-      GROUP BY 
-          posts.id, 
-          users.name, 
-          users.image, 
-          links.url, 
-          links.title,
-          links.description,
-          links.image,
-          likes."postId"
-      ORDER BY id DESC
-      LIMIT 20
-    `
-  );
+async function selectPosts(userId) {
+    return connection.query(
+        `
+        SELECT
+            posts.id,
+            posts.text,
+            posts."userId" as "userId",
+            users.name,
+            users.image,
+            links.url,
+            links.title,
+            links.description,
+            links.image as "linkImage",
+            COUNT(likes."userId") AS "likeQuantity",
+            bool_and(CASE WHEN likes."userId"=$1 THEN true ELSE null END) AS "isLiked",
+            (ARRAY_AGG(u."name"))[1:2] AS "userLiked"
+
+        FROM posts
+        JOIN users ON users.id=posts."userId"
+        JOIN links ON links.id=posts."linkId"
+        LEFT JOIN likes ON posts.id=likes."postId"
+        JOIN users as u ON likes."userId"=u.id
+
+        GROUP BY
+            posts.id,
+            users.name,
+            users.image,
+            links.url,
+            links.title,
+            links.description,
+            links.image,
+            likes."postId"
+
+        ORDER BY id DESC
+        LIMIT 20
+        `, [userId]
+    );
 };
 
 
@@ -102,6 +108,24 @@ async function updatePost(text, linkId, postId) {
               "linkId"=$2
           WHERE id=$3`,
         [text, linkId, postId]
+    );
+}
+
+async function removePostFromHashtagsPosts(postId) {
+    return connection.query(
+        `
+          DELETE FROM "hashtagsPosts"
+          WHERE "postId"=$1`,
+        [postId]
+    );
+}
+
+async function removePostFromLikes(postId) {
+    return connection.query(
+        `
+          DELETE FROM likes
+          WHERE "postId"=$1`,
+        [postId]
     );
 }
 
@@ -137,4 +161,6 @@ export {
     updatePost,
     removePost,
     getPostsByUserId,
+    removePostFromHashtagsPosts,
+    removePostFromLikes
 };

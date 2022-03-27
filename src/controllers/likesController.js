@@ -2,7 +2,7 @@ import { insertLike, selectLikes, removeLike, searchIfUserLiked } from "../repos
 
 export async function getLikes(req, res) {
   try {
-    
+
     const likes = await selectLikes();
 
     return res.status(200).send(likes.rows);
@@ -16,13 +16,13 @@ export async function toggleLikedPost(req, res) {
 
     const { postId } = req.params;
     const { id } = res.locals.user;
-    
+
     const isUserLiked = await searchIfUserLiked(id, postId);
-    
-    if(isUserLiked.rowCount){
+
+    if (isUserLiked.rowCount) {
       await removeLike(id, postId);
-    
-    }else{
+
+    } else {
       await insertLike(id, postId);
     }
 

@@ -36,7 +36,6 @@ export async function getSingleUser(req, res) {
 export async function getUserById(req, res) {
   try {
     const { id } = req.params;
-    console.log("to no by id " + id);
     const user = await connection.query(
       `
         SELECT
@@ -46,7 +45,6 @@ export async function getUserById(req, res) {
       `,
       [id]
     );
-    console.log(user.rows[0]);
     return res.status(200).send(user.rows[0]);
   } catch (error) {
     return res.sendStatus(500);
@@ -55,8 +53,9 @@ export async function getUserById(req, res) {
 
 export async function getPostsById(req, res) {
   try {
-    console.log("oi");
+    const { user } = res.locals;
     const { id } = req.params;
+
     const posts = await connection.query(
       `
         SELECT
@@ -68,17 +67,33 @@ export async function getPostsById(req, res) {
             links.url,
             links.title,
             links.description,
-            links.image as "linkImage"
+            links.image as "linkImage",
+            COUNT(likes."userId") AS "likeQuantity",
+            bool_and(CASE WHEN likes."userId"=$1 THEN true ELSE null END) AS "isLiked",
+            (ARRAY_AGG(u."name"))[1:2] AS "userLiked"
+
         FROM posts
         JOIN users ON users.id=posts."userId"
         JOIN links ON links.id=posts."linkId"
-        WHERE posts."userId"=$1
+        LEFT JOIN likes ON posts.id=likes."postId"
+        JOIN users as u ON likes."userId"=u.id
+
+        WHERE posts."userId"=$2
+        GROUP BY 
+          posts.id, 
+          users.name, 
+          users.image, 
+          links.url, 
+          links.title,
+          links.description,
+          links.image,
+          likes."postId"
+
         ORDER BY id DESC
         LIMIT 20
       `,
-      [id]
+      [user.id, id]
     );
-    console.log(posts.rows);
     return res.status(200).send(posts.rows);
   } catch (error) {
     return res.sendStatus(500);

@@ -9,9 +9,16 @@ import {
     checkPostExists,
     updatePost,
     removePost,
+    removePostFromHashtagsPosts,
+    removePostFromLikes
 } from "../repositories/postsRepository.js";
 
-import { selectOnlyTwoLikes, searchIfUserLiked } from "../repositories/likesRepository.js";
+
+import {
+    createHashtag,
+    getHashtagByName,
+    connectHashtagWithPost,
+} from "../repositories/hashtagsRepository.js";
 
 export async function publishPost(req, res) {
     try {
@@ -44,22 +51,12 @@ export async function publishPost(req, res) {
 }
 
 export async function getPosts(req, res) {
-    
     const { id } = res.locals.user;
-    let arrayComPostsNovos = [];
 
     try {
-        const {rows: posts} = await selectPosts();
+        const { rows: posts } = await selectPosts(id);
 
-        for (let i = 0; i < posts.length; i++) {
-            const response = await searchIfUserLiked(id, posts[i].id);
-            const value = Boolean(response.rowCount > 0)
-            const {rows: userLiked} = await selectOnlyTwoLikes(posts[i].id)
-            const postWithIsLiked = {...posts[i], "isLiked": value, userLiked}
-            arrayComPostsNovos = [...arrayComPostsNovos, postWithIsLiked]            
-        };
-        
-        return res.status(200).send(arrayComPostsNovos);
+        return res.status(200).send(posts);
     } catch (error) {
         console.log(error)
         return res.sendStatus(500);
@@ -82,6 +79,27 @@ export async function editPost(req, res) {
             return res.sendStatus(401);
         }
 
+        await removePostFromHashtagsPosts(postId);
+
+        const hashtagsMatched = text.match(/#[a-z0-9_]+/g);
+        if (hashtagsMatched) {
+            const hashtags = hashtagsMatched.map((hashtag) => hashtag.replace("#", ""));
+            hashtags.forEach(async (hashtag) => {
+                let hashtagId;
+                const result = await getHashtagByName(hashtag);
+                if (result.rowCount !== 0) {
+                    hashtagId = result.rows[0].id;
+                    await connectHashtagWithPost(hashtagId, postId);
+                    return;
+                }
+                await createHashtag(hashtag);
+                const resultNewHashtag = await getHashtagByName(hashtag);
+                hashtagId = resultNewHashtag.rows[0].id;
+                await connectHashtagWithPost(hashtagId, postId);
+            });
+        }
+
+
         let linkId = null;
 
         const metadata = await urlMetadata(link, { descriptionLength: 110 });
@@ -92,10 +110,12 @@ export async function editPost(req, res) {
         if (linkExists.rowCount === 0) {
             await createLink(url, title, description, image);
 
-            const newLink = selectNewLink(url);
+            const newLink = await selectNewLink(url);
 
             linkId = newLink.rows[0].id;
         } else {
+            await updateLink(title, description, image, url);
+
             linkId = linkExists.rows[0].id;
         }
 
@@ -121,6 +141,10 @@ export async function deletePost(req, res) {
         if (postExists.rows[0].userId !== user.id) {
             return res.sendStatus(401);
         }
+
+        await removePostFromHashtagsPosts(postId);
+
+        await removePostFromLikes(postId);
 
         await removePost(postId);
 

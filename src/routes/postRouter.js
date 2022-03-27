@@ -3,7 +3,7 @@ import {
   deletePost,
   editPost,
   getPosts,
-  publishPost,
+  publishPost
 } from "../controllers/postController.js";
 import validaTokenMiddleware from "../middlewares/validaTokenMiddleware.js";
 import validSchema from "../middlewares/validSchema.js";
