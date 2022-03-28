@@ -6,6 +6,7 @@ import {
   createSession,
   updateSession,
   checkEmailExist,
+  checkUsernameExist,
 } from "../repositories/urlsRepository.js";
 
 export async function signIn(req, res) {
@@ -38,11 +39,14 @@ export async function signIn(req, res) {
 export async function signUp(req, res) {
   try {
     const { name, email, password, image } = req.body;
-
+    const nameLower = name.toLowerCase();
     const isuser = await checkEmailExist(email);
-
+    const isname = await checkUsernameExist(nameLower);
     if (isuser.rows.length !== 0) {
       return res.status(409).send("used email");
+    }
+    if (isname.rows.length !== 0) {
+      return res.status(410).send("used username ");
     }
 
     const passwordHash = bcrypt.hashSync(password, 10);
