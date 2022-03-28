@@ -1,50 +1,50 @@
 import connection from "../database/database.js";
 
 async function createHashtag(name) {
-    return connection.query(
-        `
+  return connection.query(
+    `
             INSERT INTO hashtags(name)
                 VALUES ($1)        
         `,
-        [name]
-    );
+    [name]
+  );
 }
 
 async function connectHashtagWithPost(hashtagId, postId) {
-    return connection.query(
-        `
+  return connection.query(
+    `
             INSERT INTO "hashtagsPosts"("hashtagId","postId")
                 VALUES ($1,$2)
         `,
-        [hashtagId, postId]
-    );
+    [hashtagId, postId]
+  );
 }
 
 async function getHashtagByName(hashtagName) {
-    return connection.query(
-        `
+  return connection.query(
+    `
             SELECT * FROM hashtags h
                 WHERE h.name=$1
         `,
-        [hashtagName]
-    );
+    [hashtagName]
+  );
 }
 
 async function getHashtagsWithLimit() {
-    return connection.query(
-        `
+  return connection.query(
+    `
         SELECT h.name, h.id, COUNT(hp."hashtagId") AS count FROM hashtags h
             JOIN "hashtagsPosts" hp ON hp."hashtagId"=h.id
             GROUP BY h.name,h.id
             ORDER BY count DESC
             LIMIT 10
         `
-    );
+  );
 }
 
 async function getPostsWithHashtagName(postId, hashtag) {
-    return connection.query(
-        `
+  return connection.query(
+    `
             SELECT
                 p.id,
                 p.text,
@@ -84,14 +84,14 @@ async function getPostsWithHashtagName(postId, hashtag) {
             ORDER BY id DESC
             LIMIT 20
         `,
-        [postId, hashtag]
-    );
+    [postId, hashtag]
+  );
 }
 
 export {
-    createHashtag,
-    getHashtagsWithLimit,
-    getPostsWithHashtagName,
-    connectHashtagWithPost,
-    getHashtagByName,
+  createHashtag,
+  getHashtagsWithLimit,
+  getPostsWithHashtagName,
+  connectHashtagWithPost,
+  getHashtagByName,
 };

@@ -39,10 +39,19 @@ async function checkEmailExist(email) {
     [email]
   );
 }
+async function checkUsernameExist(name) {
+  return connection.query(
+    `SELECT * FROM users 
+      WHERE name = $1
+    `,
+    [name]
+  );
+}
 export {
   createUser,
   checkUserSession,
   createSession,
   updateSession,
   checkEmailExist,
+  checkUsernameExist,
 };
