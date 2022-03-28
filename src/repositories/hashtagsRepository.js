@@ -57,9 +57,9 @@ async function getPostsWithHashtagName(postId, hashtag) {
                 links.image as "linkImage",
                 hp."hashtagId", 
                 h."name" AS "hashtagName",
-                COUNT(likes."userId") AS "likeQuantity",
-                bool_and(CASE WHEN likes."userId"=$1 THEN true ELSE null END) AS "isLiked",
-                (ARRAY_AGG(u."name"))[1:2] AS "userLiked"
+                COUNT(DISTINCT likes."userId") AS "likeQuantity",
+                bool_and(DISTINCT CASE WHEN likes."userId"=$1 THEN true ELSE null END) AS "isLiked",
+                (ARRAY_AGG(DISTINCT u."name"))[1:2] AS "userLiked"
 
             FROM posts p
             JOIN users ON users.id=p."userId"
