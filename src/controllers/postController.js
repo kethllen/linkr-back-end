@@ -19,7 +19,6 @@ import {
     getHashtagByName,
     connectHashtagWithPost,
 } from "../repositories/hashtagsRepository.js";
-import connection from "../database/database.js";
 
 export async function publishPost(req, res) {
     try {
@@ -49,7 +48,7 @@ export async function publishPost(req, res) {
     } catch (error) {
         return res.sendStatus(500);
     }
-}
+};
 
 export async function getPosts(req, res) {
     const { id } = res.locals.user;
@@ -62,7 +61,7 @@ export async function getPosts(req, res) {
         console.log(error)
         return res.sendStatus(500);
     }
-}
+};
 
 export async function editPost(req, res) {
     try {
@@ -126,7 +125,7 @@ export async function editPost(req, res) {
     } catch (error) {
         return res.sendStatus(500);
     }
-}
+};
 
 export async function deletePost(req, res) {
     try {
@@ -153,4 +152,4 @@ export async function deletePost(req, res) {
     } catch (error) {
         return res.sendStatus(500);
     }
-}
+};
