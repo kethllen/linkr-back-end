@@ -82,7 +82,7 @@ export async function editPost(req, res) {
 
         await removePostFromHashtagsPosts(postId);
 
-        const hashtagsMatched = text.match(/#[a-z0-9_]+/g);
+        const hashtagsMatched = text?.match(/#[a-z0-9_]+/g);
         if (hashtagsMatched) {
             const hashtags = hashtagsMatched.map((hashtag) => hashtag.replace("#", ""));
             hashtags.forEach(async (hashtag) => {
@@ -99,7 +99,6 @@ export async function editPost(req, res) {
                 await connectHashtagWithPost(hashtagId, postId);
             });
         }
-
 
         let linkId = null;
 
