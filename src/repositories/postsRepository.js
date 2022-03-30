@@ -131,6 +131,26 @@ async function removePostFromLikes(postId) {
   );
 }
 
+async function removePostFromComments(postId) {
+  return connection.query(
+    `
+          DELETE FROM comments
+          WHERE "postId"=$1`,
+    [postId]
+  );
+}
+
+async function removePostFromReposts(postId) {
+  return connection.query(
+    `
+          DELETE FROM reposts
+          WHERE "postId"=$1`,
+    [postId]
+  );
+}
+
+
+
 async function removePost(postId) {
   return connection.query(
     `
@@ -165,4 +185,6 @@ export {
   getPostsByUserId,
   removePostFromHashtagsPosts,
   removePostFromLikes,
+  removePostFromComments,
+  removePostFromReposts
 };
