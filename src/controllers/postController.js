@@ -10,7 +10,9 @@ import {
     updatePost,
     removePost,
     removePostFromHashtagsPosts,
-    removePostFromLikes
+    removePostFromLikes,
+    removePostFromReposts,
+    removePostFromComments
 } from "../repositories/postsRepository.js";
 
 
@@ -145,6 +147,10 @@ export async function deletePost(req, res) {
         await removePostFromHashtagsPosts(postId);
 
         await removePostFromLikes(postId);
+
+        await removePostFromReposts(postId);
+
+        await removePostFromComments(postId);
 
         await removePost(postId);
 
