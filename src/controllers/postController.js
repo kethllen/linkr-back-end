@@ -12,9 +12,8 @@ import {
     removePostFromHashtagsPosts,
     removePostFromLikes,
     removePostFromReposts,
-    removePostFromComments
+    removePostFromComments,
 } from "../repositories/postsRepository.js";
-
 
 import {
     createHashtag,
@@ -55,13 +54,14 @@ export async function publishPost(req, res) {
 
 export async function getPosts(req, res) {
     const { id } = res.locals.user;
+    const { offset } = req.query;
 
     try {
-        const { rows: posts } = await selectPosts(id);
+        const { rows: posts } = await selectPosts(id, offset);
 
         return res.status(200).send(posts);
     } catch (error) {
-        console.log(error)
+        console.log(error);
         return res.sendStatus(500);
     }
 }
@@ -86,7 +86,9 @@ export async function editPost(req, res) {
 
         const hashtagsMatched = text?.match(/#[a-z0-9_]+/g);
         if (hashtagsMatched) {
-            const hashtags = hashtagsMatched.map((hashtag) => hashtag.replace("#", ""));
+            const hashtags = hashtagsMatched.map((hashtag) =>
+                hashtag.replace("#", "")
+            );
             hashtags.forEach(async (hashtag) => {
                 let hashtagId;
                 const result = await getHashtagByName(hashtag);
