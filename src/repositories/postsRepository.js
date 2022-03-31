@@ -65,7 +65,7 @@ async function selectPosts(userId) {
               links.image as "linkImage",
               COUNT(likes."userId") AS "likeQuantity",
               COUNT(comments."userId") AS "commentQuantity",
-              COUNT(posts."repostId") AS "repostQuantity",
+              posts."repostQuantity",
               bool_and(CASE WHEN likes."userId" = $1 THEN true ELSE null END) AS "isLiked",
               (ARRAY_AGG(u."name"))[1:2] AS "userLiked"
 

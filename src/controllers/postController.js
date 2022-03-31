@@ -20,6 +20,7 @@ import {
     getHashtagByName,
     connectHashtagWithPost,
 } from "../repositories/hashtagsRepository.js";
+import connection from "../database/database.js";
 
 export async function publishPost(req, res) {
     try {
@@ -161,10 +162,34 @@ export async function repostPost(req, res) {
         const { postId } = req.params;
         const { user } = res.locals;
 
-        console.log(user);
+        const repostedPost = await connection.query(
+            `SELECT * 
+            FROM "posts"
+            WHERE id=$1
+        `, [postId]);
+
+
+        if (repostedPost.rowCount === 0) {
+            return res.sendStatus(404);
+        }
+
+        const { id, text, linkId, repostQuantity } = repostedPost.rows[0];
+
+        await connection.query(`
+            UPDATE posts
+            SET "repostQuantity"=$1
+            WHERE "repostId"=$2
+        `, [(repostQuantity + 1), postId])
+
+        await connection.query(`
+            INSERT INTO posts("userId",text,"linkId","repostId","repostQuantity")
+            VALUES($1,$2,$3,$4,$5)
+        `, [user.id, text, linkId, id, (repostQuantity + 1)]);
+
 
         return res.sendStatus(201);
     } catch (error) {
+        console.log(error);
         return res.sendStatus(500);
     }
 }
