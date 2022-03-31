@@ -1,17 +1,19 @@
 import urlMetadata from "url-metadata";
 import {
-  checkLinkExists,
-  createLink,
-  selectNewLink,
-  updateLink,
-  createPost,
-  selectPosts,
-  checkPostExists,
-  updatePost,
-  removePost,
-  removePostFromHashtagsPosts,
-  removePostFromLikes,
-  removePostFromComments,
+
+    checkLinkExists,
+    createLink,
+    selectNewLink,
+    updateLink,
+    createPost,
+    selectPosts,
+    checkPostExists,
+    updatePost,
+    removePost,
+    removePostFromHashtagsPosts,
+    removePostFromLikes,
+    removePostFromComments
+
 } from "../repositories/postsRepository.js";
 
 import {
@@ -149,4 +151,41 @@ export async function deletePost(req, res) {
   } catch (error) {
     return res.sendStatus(500);
   }
+}
+
+export async function repostPost(req, res) {
+    try {
+        const { postId } = req.params;
+        const { user } = res.locals;
+
+        const repostedPost = await connection.query(
+            `SELECT * 
+            FROM "posts"
+            WHERE id=$1
+        `, [postId]);
+
+
+        if (repostedPost.rowCount === 0) {
+            return res.sendStatus(404);
+        }
+
+        const { id, text, linkId, repostQuantity } = repostedPost.rows[0];
+
+        await connection.query(`
+            UPDATE posts
+            SET "repostQuantity"=$1
+            WHERE "repostId"=$2
+        `, [(repostQuantity + 1), postId])
+
+        await connection.query(`
+            INSERT INTO posts("userId",text,"linkId","repostId","repostQuantity")
+            VALUES($1,$2,$3,$4,$5)
+        `, [user.id, text, linkId, id, (repostQuantity + 1)]);
+
+
+        return res.sendStatus(201);
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
 }
