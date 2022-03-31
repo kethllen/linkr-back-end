@@ -12,6 +12,7 @@ import {
   removePostFromHashtagsPosts,
   removePostFromLikes,
   removePostFromComments,
+  selectPostsReposts,
 } from "../repositories/postsRepository.js";
 
 import {
@@ -53,16 +54,39 @@ export async function publishPost(req, res) {
 
 export async function getPosts(req, res) {
   const { id } = res.locals.user;
-  const { offset } = req.query;
 
   try {
-    if (offset) {
-      const { rows: posts } = await selectPosts(id, offset);
-      return res.status(200).send(posts);
-    } else {
-      const { rows: posts } = await selectPosts(id, 0);
-      return res.status(200).send(posts);
+    const { rows: posts } = await selectPosts(id);
+    let retorno = [];
+
+    for (let post of posts) {
+      if (post?.repostId !== null) {
+        const { rows: originalPost } = await selectPostsReposts(post.repostId); // buscar
+        const concatenar = {
+          id: post.id,
+          name: post.name,
+          userId: post.userId,
+          repostId: post.repostId,
+          idUserPost: originalPost[0].userId,
+          namePost: originalPost[0].name,
+          image: originalPost[0].image,
+          url: originalPost[0].url,
+          title: originalPost[0].title,
+          text: originalPost[0].text,
+          description: originalPost[0].description,
+          linkImage: originalPost[0].linkImage,
+          likeQuantity: originalPost[0].likeQuantity,
+          commentQuantity: originalPost[0].commentQuantity,
+          repostQuantity: originalPost[0].repostQuantity,
+          isLiked: originalPost[0].isLiked,
+          userLiked: originalPost[0].userLiked,
+        };
+        retorno.push(concatenar);
+      } else {
+        retorno.push(post);
+      }
     }
+    return res.status(200).send(retorno);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
