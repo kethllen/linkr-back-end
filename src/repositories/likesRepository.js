@@ -4,7 +4,7 @@ async function selectLikes() {
   return await connection.query(
     `
         SELECT * 
-        FROM likes
+          FROM likes
     `
   );
 };

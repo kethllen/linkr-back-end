@@ -2,7 +2,8 @@ import connection from "../database/database.js";
 
 async function getTableFollowers(){
     return await connection.query(`
-        SELECT * FROM followers;
+        SELECT * 
+            FROM followers;
     `)
 };
 
@@ -13,7 +14,7 @@ async function insertIntoFollowers(loggedUser, visitedUserId){
             VALUES ($1, $2)
     `, [loggedUser, visitedUserId]
     )
-}
+};
 
 async function removeFromFollowers(loggedUser, visitedUserId){
     return await connection.query(`
@@ -21,7 +22,7 @@ async function removeFromFollowers(loggedUser, visitedUserId){
             WHERE "userId"= $1 AND "followingId" = $2
     `, [loggedUser, visitedUserId]
     )
-}
+};
 
 async function verifyFollower(loggedUser, visitedUserId){
     return await connection.query(`
