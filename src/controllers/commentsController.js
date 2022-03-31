@@ -5,10 +5,11 @@ import {
 
 export async function getComments(req, res) {
   try {
+    const { user } = res.locals;
     const { postId } = req.params;
-    const comments = await selectComments(id);
-
-    return res.status(200).send(likes.rows);
+    const comments = await selectComments(Number(postId), user.id);
+    console.log(comments.rows);
+    return res.status(200).send(comments.rows);
   } catch (error) {
     return res.sendStatus(500);
   }
