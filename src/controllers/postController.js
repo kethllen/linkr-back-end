@@ -1,19 +1,18 @@
 import urlMetadata from "url-metadata";
 import {
-
-    checkLinkExists,
-    createLink,
-    selectNewLink,
-    updateLink,
-    createPost,
-    selectPosts,
-    checkPostExists,
-    updatePost,
-    removePost,
-    removePostFromHashtagsPosts,
-    removePostFromLikes,
-    removePostFromComments
-
+  checkLinkExists,
+  createLink,
+  selectNewLink,
+  updateLink,
+  createPost,
+  selectPosts,
+  checkPostExists,
+  updatePost,
+  removePost,
+  removePostFromHashtagsPosts,
+  removePostFromLikes,
+  removePostFromComments,
+  selectPostsReposts,
 } from "../repositories/postsRepository.js";
 
 import {
@@ -56,7 +55,36 @@ export async function getPosts(req, res) {
 
   try {
     const { rows: posts } = await selectPosts(id);
-    return res.status(200).send(posts);
+    let retorno = [];
+
+    for (let post of posts) {
+      if (post?.repostId !== null) {
+        const { rows: originalPost } = await selectPostsReposts(post.repostId); // buscar
+        const concatenar = {
+          id: post.id,
+          name: post.name,
+          userId: post.userId,
+          repostId: post.repostId,
+          idUserPost: originalPost[0].userId,
+          namePost: originalPost[0].name,
+          image: originalPost[0].image,
+          url: originalPost[0].url,
+          title: originalPost[0].title,
+          text: originalPost[0].text,
+          description: originalPost[0].description,
+          linkImage: originalPost[0].linkImage,
+          likeQuantity: originalPost[0].likeQuantity,
+          commentQuantity: originalPost[0].commentQuantity,
+          repostQuantity: originalPost[0].repostQuantity,
+          isLiked: originalPost[0].isLiked,
+          userLiked: originalPost[0].userLiked,
+        };
+        retorno.push(concatenar);
+      } else {
+        retorno.push(post);
+      }
+    }
+    return res.status(200).send(retorno);
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -154,38 +182,44 @@ export async function deletePost(req, res) {
 }
 
 export async function repostPost(req, res) {
-    try {
-        const { postId } = req.params;
-        const { user } = res.locals;
+  try {
+    const { postId } = req.params;
+    const { user } = res.locals;
 
-        const repostedPost = await connection.query(
-            `SELECT * 
+    const repostedPost = await connection.query(
+      `SELECT * 
             FROM "posts"
             WHERE id=$1
-        `, [postId]);
+        `,
+      [postId]
+    );
 
+    if (repostedPost.rowCount === 0) {
+      return res.sendStatus(404);
+    }
 
-        if (repostedPost.rowCount === 0) {
-            return res.sendStatus(404);
-        }
+    const { id, text, linkId, repostQuantity } = repostedPost.rows[0];
 
-        const { id, text, linkId, repostQuantity } = repostedPost.rows[0];
-
-        await connection.query(`
+    await connection.query(
+      `
             UPDATE posts
             SET "repostQuantity"=$1
             WHERE "repostId"=$2
-        `, [(repostQuantity + 1), postId])
+        `,
+      [repostQuantity + 1, postId]
+    );
 
-        await connection.query(`
+    await connection.query(
+      `
             INSERT INTO posts("userId",text,"linkId","repostId","repostQuantity")
             VALUES($1,$2,$3,$4,$5)
-        `, [user.id, text, linkId, id, (repostQuantity + 1)]);
+        `,
+      [user.id, text, linkId, id, repostQuantity + 1]
+    );
 
-
-        return res.sendStatus(201);
-    } catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
-    }
+    return res.sendStatus(201);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
 }
