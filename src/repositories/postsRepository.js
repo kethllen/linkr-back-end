@@ -50,7 +50,7 @@ async function createPost(userId, text, linkId) {
   );
 }
 
-async function selectPosts(userId) {
+async function selectPosts(userId, offset) {
   return connection.query(
     `
         SELECT
@@ -86,9 +86,10 @@ async function selectPosts(userId) {
             likes."postId"
 
         ORDER BY id DESC
-        LIMIT 20
+        OFFSET $2
+        LIMIT 5
         `,
-    [userId]
+    [userId, offset]
   );
 }
 
@@ -149,8 +150,6 @@ async function removePostFromReposts(postId) {
   );
 }
 
-
-
 async function removePost(postId) {
   return connection.query(
     `
@@ -186,5 +185,5 @@ export {
   removePostFromHashtagsPosts,
   removePostFromLikes,
   removePostFromComments,
-  removePostFromReposts
+  removePostFromReposts,
 };

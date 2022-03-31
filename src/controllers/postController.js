@@ -53,11 +53,16 @@ export async function publishPost(req, res) {
 
 export async function getPosts(req, res) {
   const { id } = res.locals.user;
+  const { offset } = req.query;
 
   try {
-    const { rows: posts } = await selectPosts(id);
-
-    return res.status(200).send(posts);
+    if (offset) {
+      const { rows: posts } = await selectPosts(id, offset);
+      return res.status(200).send(posts);
+    } else {
+      const { rows: posts } = await selectPosts(id, 0);
+      return res.status(200).send(posts);
+    }
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
