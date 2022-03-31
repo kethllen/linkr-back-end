@@ -3,7 +3,8 @@ import {
   deletePost,
   editPost,
   getPosts,
-  publishPost
+  publishPost,
+  repostPost
 } from "../controllers/postController.js";
 import validaTokenMiddleware from "../middlewares/validaTokenMiddleware.js";
 import validSchema from "../middlewares/validSchema.js";
@@ -24,5 +25,6 @@ postRouter.put(
   validaTokenMiddleware,
   editPost
 );
+postRouter.post("/repost/:postId", validaTokenMiddleware, repostPost)
 
 export default postRouter;

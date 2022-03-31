@@ -11,7 +11,6 @@ import {
     removePost,
     removePostFromHashtagsPosts,
     removePostFromLikes,
-    removePostFromReposts,
     removePostFromComments
 } from "../repositories/postsRepository.js";
 
@@ -21,7 +20,6 @@ import {
     getHashtagByName,
     connectHashtagWithPost,
 } from "../repositories/hashtagsRepository.js";
-import connection from "../database/database.js";
 
 export async function publishPost(req, res) {
     try {
@@ -148,13 +146,24 @@ export async function deletePost(req, res) {
 
         await removePostFromLikes(postId);
 
-        await removePostFromReposts(postId);
-
         await removePostFromComments(postId);
 
         await removePost(postId);
 
         return res.sendStatus(200);
+    } catch (error) {
+        return res.sendStatus(500);
+    }
+}
+
+export async function repostPost(req, res) {
+    try {
+        const { postId } = req.params;
+        const { user } = res.locals;
+
+        console.log(user);
+
+        return res.sendStatus(201);
     } catch (error) {
         return res.sendStatus(500);
     }
