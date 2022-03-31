@@ -1,5 +1,15 @@
 import connection from "../database/database.js";
 
+async function checkRepostId(postId) {
+  return connection.query(
+    `
+    SELECT *
+    FROM posts
+    WHERE posts.id=$1
+    `,
+    [postId]
+  );
+}
 async function selectComments(postId, userId) {
   return connection.query(
     `
@@ -20,7 +30,10 @@ async function selectComments(postId, userId) {
       GROUP BY
           comments.id,
           users.name,
-          users.image`,
+          users.image
+      ORDER BY
+          comments.id DESC
+      `,
     [userId, postId]
   );
 }
@@ -35,4 +48,4 @@ async function insertComments(userId, postId, comment) {
   );
 }
 
-export { selectComments, insertComments };
+export { selectComments, insertComments, checkRepostId };
