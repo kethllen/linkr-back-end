@@ -1,6 +1,5 @@
 import urlMetadata from "url-metadata";
 import {
-<<<<<<< HEAD
   checkLinkExists,
   createLink,
   selectNewLink,
@@ -14,22 +13,6 @@ import {
   removePostFromLikes,
   removePostFromComments,
   selectPostsReposts,
-=======
-
-    checkLinkExists,
-    createLink,
-    selectNewLink,
-    updateLink,
-    createPost,
-    selectPosts,
-    checkPostExists,
-    updatePost,
-    removePost,
-    removePostFromHashtagsPosts,
-    removePostFromLikes,
-    removePostFromComments
-
->>>>>>> 9c7d449dd0013ccb0547e4e8a1a70b7c7abd9b07
 } from "../repositories/postsRepository.js";
 
 import {
@@ -72,7 +55,6 @@ export async function getPosts(req, res) {
 
   try {
     const { rows: posts } = await selectPosts(id);
-<<<<<<< HEAD
     let retorno = [];
 
     for (let post of posts) {
@@ -103,9 +85,6 @@ export async function getPosts(req, res) {
       }
     }
     return res.status(200).send(retorno);
-=======
-    return res.status(200).send(posts);
->>>>>>> 9c7d449dd0013ccb0547e4e8a1a70b7c7abd9b07
   } catch (error) {
     console.log(error);
     return res.sendStatus(500);
@@ -203,38 +182,44 @@ export async function deletePost(req, res) {
 }
 
 export async function repostPost(req, res) {
-    try {
-        const { postId } = req.params;
-        const { user } = res.locals;
+  try {
+    const { postId } = req.params;
+    const { user } = res.locals;
 
-        const repostedPost = await connection.query(
-            `SELECT * 
+    const repostedPost = await connection.query(
+      `SELECT * 
             FROM "posts"
             WHERE id=$1
-        `, [postId]);
+        `,
+      [postId]
+    );
 
+    if (repostedPost.rowCount === 0) {
+      return res.sendStatus(404);
+    }
 
-        if (repostedPost.rowCount === 0) {
-            return res.sendStatus(404);
-        }
+    const { id, text, linkId, repostQuantity } = repostedPost.rows[0];
 
-        const { id, text, linkId, repostQuantity } = repostedPost.rows[0];
-
-        await connection.query(`
+    await connection.query(
+      `
             UPDATE posts
             SET "repostQuantity"=$1
             WHERE "repostId"=$2
-        `, [(repostQuantity + 1), postId])
+        `,
+      [repostQuantity + 1, postId]
+    );
 
-        await connection.query(`
+    await connection.query(
+      `
             INSERT INTO posts("userId",text,"linkId","repostId","repostQuantity")
             VALUES($1,$2,$3,$4,$5)
-        `, [user.id, text, linkId, id, (repostQuantity + 1)]);
+        `,
+      [user.id, text, linkId, id, repostQuantity + 1]
+    );
 
-
-        return res.sendStatus(201);
-    } catch (error) {
-        console.log(error);
-        return res.sendStatus(500);
-    }
+    return res.sendStatus(201);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
 }

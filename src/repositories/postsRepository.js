@@ -220,4 +220,5 @@ export {
   removePostFromHashtagsPosts,
   removePostFromLikes,
   removePostFromComments,
+  selectPostsReposts,
 };
