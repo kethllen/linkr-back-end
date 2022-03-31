@@ -19,7 +19,6 @@ import {
   getHashtagByName,
   connectHashtagWithPost,
 } from "../repositories/hashtagsRepository.js";
-import connection from "../database/database.js";
 
 export async function publishPost(req, res) {
   try {
@@ -43,7 +42,6 @@ export async function publishPost(req, res) {
 
       linkId = linkExists.rows[0].id;
     }
-
     await createPost(user.id, text, linkId);
     return res.sendStatus(201);
   } catch (error) {
@@ -56,7 +54,6 @@ export async function getPosts(req, res) {
 
   try {
     const { rows: posts } = await selectPosts(id);
-
     return res.status(200).send(posts);
   } catch (error) {
     console.log(error);
@@ -122,7 +119,6 @@ export async function editPost(req, res) {
     }
 
     await updatePost(text, linkId, postId);
-
     return res.sendStatus(200);
   } catch (error) {
     return res.sendStatus(500);
@@ -145,11 +141,8 @@ export async function deletePost(req, res) {
     }
 
     await removePostFromHashtagsPosts(postId);
-
     await removePostFromLikes(postId);
-
     await removePostFromComments(postId);
-
     await removePost(postId);
 
     return res.sendStatus(200);
