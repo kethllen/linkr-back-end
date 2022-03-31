@@ -93,7 +93,8 @@ async function selectPostsReposts(postId) {
 }
 async function selectPosts(userId) {
   return connection.query(
-    `SELECT
+    `
+          SELECT
               posts.id,
               posts.text,
               posts."userId" as "userId",
@@ -184,15 +185,6 @@ async function removePostFromComments(postId) {
   );
 }
 
-async function removePostFromReposts(postId) {
-  return connection.query(
-    `
-          DELETE FROM reposts
-          WHERE "postId"=$1`,
-    [postId]
-  );
-}
-
 async function removePost(postId) {
   return connection.query(
     `
@@ -228,6 +220,4 @@ export {
   removePostFromHashtagsPosts,
   removePostFromLikes,
   removePostFromComments,
-  removePostFromReposts,
-  selectPostsReposts,
 };
