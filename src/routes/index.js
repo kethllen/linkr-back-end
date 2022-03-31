@@ -2,10 +2,11 @@ import { Router } from "express";
 import authRouter from "./authRouter.js";
 import postRouter from "./postRouter.js";
 import hashtagRouter from "./hashtagRouter.js";
-import signOutRouter from "./signOutRouter.js"
+import signOutRouter from "./signOutRouter.js";
 import userRouter from "./userRouter.js";
 import likesRouter from "./likesRouter.js";
 import followersRouter from "./followersRouter.js";
+import commentsRouter from "./commentsRouter.js";
 
 const router = Router();
 router.use(authRouter);
@@ -15,6 +16,6 @@ router.use(signOutRouter);
 router.use(userRouter);
 router.use(likesRouter);
 router.use(followersRouter);
-
+router.use(commentsRouter);
 
 export default router;

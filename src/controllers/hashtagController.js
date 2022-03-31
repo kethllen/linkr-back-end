@@ -13,7 +13,7 @@ async function postHashtags(req, res) {
 
     try {
         const postId = await getPostsByUserId(id);
-        hashtags.forEach(async (hashtag) => {
+        hashtags?.forEach(async (hashtag) => {
             let hashtagId;
             const result = await getHashtagByName(hashtag);
             if (result.rowCount !== 0) {
