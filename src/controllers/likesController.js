@@ -22,6 +22,7 @@ export async function toggleLikedPost(req, res) {
     const { id } = res.locals.user;
 
     const repost = await checkRepostId(Number(postId));
+
     if (repost.rows[0].repostId === null) {
       const isUserLiked = await searchIfUserLiked(id, postId);
       if (isUserLiked.rowCount) {

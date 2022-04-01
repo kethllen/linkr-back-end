@@ -43,7 +43,6 @@ export async function getPostsById(req, res) {
     const { user } = res.locals;
     const { id } = req.params;
     const { offset } = req.query;
-    console.log(offset);
     let newOffset = 0;
     if (offset) {
       newOffset = offset;
