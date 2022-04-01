@@ -1,41 +1,46 @@
 import connection from "../database/database.js";
 
-async function selectUsers() {
-    return await connection.query(
-        `
-      SELECT * FROM users
-
+async function selectUsers(id) {
+  return await connection.query(
     `
+    SELECT
+    users.*,
+   bool_and(CASE WHEN followers."userId"=$1 THEN true ELSE null END) AS "isFollowing"
+FROM users
+LEFT JOIN followers ON users.id=followers."followingId"
+GROUP BY
+    users.id
+      `,
+    [id]
   );
-
 }
 
 async function selectSingleUser(token) {
-    return await connection.query(
-        `
+  return await connection.query(
+    `
   SELECT u.id, u.name, u.image FROM users u
   JOIN sessions s
   ON s."userId" = u.id
   WHERE s.token = $1`,
-        [token]
-    );
+    [token]
+  );
 }
 
 async function selectUserById(id) {
-    return await connection.query(
-        `
+  return await connection.query(
+    `
         SELECT
             *
         FROM users
         WHERE id=$1   
       `,
-        [id]
-    );
+    [id]
+  );
 }
 
 async function selectPostsById(userId, id, offset) {
-    return await connection.query(
-        `
+  return await connection.query(
+    `
         SELECT
             posts.id,
             posts.text,
@@ -70,12 +75,11 @@ async function selectPostsById(userId, id, offset) {
           likes."postId"
 
         ORDER BY id DESC
-         LIMIT 10
-         OFFSET $3
-
+            LIMIT 10
+            OFFSET $3
       `,
-        [userId, id, offset]
-    );
+    [userId, id, offset]
+  );
 }
 
 export { selectUserById, selectPostsById, selectSingleUser, selectUsers };
