@@ -49,47 +49,91 @@ async function createPost(userId, text, linkId) {
         [userId, text, linkId]
     );
 }
+async function selectPostsReposts(userId, postId) {
+  return connection.query(
+    `SELECT
+              posts.id,
+              posts.text,
+              posts."userId" as "userId",
+              posts."repostId",
+              users.name,
+              users.image,
+              links.url,
+              links.title,
+              links.description,
+              links.image as "linkImage",
+              COUNT(likes."userId") AS "likeQuantity",
+              COUNT(comments."userId") AS "commentQuantity",
+              posts."repostQuantity",
+              bool_and(CASE WHEN likes."userId" = $1 THEN true ELSE null END) AS "isLiked",
+              (ARRAY_AGG(u."name"))[1:2] AS "userLiked"
+              
+          FROM posts
+          JOIN users ON users.id = posts."userId"
+          JOIN links ON links.id = posts."linkId"
+          LEFT JOIN likes ON posts.id = likes."postId"
+          LEFT JOIN comments ON posts.id = comments."postId"
+          LEFT JOIN users as u ON likes."userId" = u.id
 
-async function selectPosts(userId, offset) {
-    return connection.query(
-        `
-        SELECT
-            posts.id,
-            posts.text,
-            posts."userId" as "userId",
-            users.name,
-            users.image,
-            links.url,
-            links.title,
-            links.description,
-            links.image as "linkImage",
-            COUNT(likes."userId") AS "likeQuantity",
-            COUNT(comments."userId") AS "commentQuantity",
-            bool_and(CASE WHEN likes."userId"=$1 THEN true ELSE null END) AS "isLiked",
-            (ARRAY_AGG(u."name"))[1:2] AS "userLiked"
+          WHERE posts.id=$2
 
-        FROM posts
-        JOIN users ON users.id=posts."userId"
-        JOIN links ON links.id=posts."linkId"
-        LEFT JOIN likes ON posts.id=likes."postId"
-        LEFT JOIN comments ON posts.id=comments."postId"
-        LEFT JOIN users as u ON likes."userId"=u.id
-
-        GROUP BY
-            posts.id,
-            users.name,
-            users.image,
-            links.url,
-            links.title,
-            links.description,
-            links.image,
-            likes."postId"
-
-        ORDER BY id DESC
-        LIMIT 10
-        OFFSET $2
+          GROUP BY
+                posts.id,
+                users.name,
+                users.image,
+                links.url,
+                links.title,
+                links.description,
+                links.image,
+                likes."postId"
+          ORDER BY id DESC
         `,
-        [userId, offset]
+    [userId, postId]
+  );
+}
+async function selectPosts(userId) {
+  return connection.query(
+    `
+          SELECT
+              posts.id,
+              posts.text,
+              posts."userId" as "userId",
+              posts."repostId",
+              users.name,
+              users.image,
+              links.url,
+              links.title,
+              links.description,
+              links.image as "linkImage",
+              COUNT(likes."userId") AS "likeQuantity",
+              COUNT(comments."userId") AS "commentQuantity",
+              posts."repostQuantity",
+              bool_and(CASE WHEN likes."userId" = $1 THEN true ELSE null END) AS "isLiked",
+              (ARRAY_AGG(u."name"))[1:2] AS "userLiked"
+
+          FROM posts
+          JOIN users ON users.id = posts."userId"
+          JOIN links ON links.id = posts."linkId"
+          LEFT JOIN likes ON posts.id = likes."postId"
+          LEFT JOIN comments ON posts.id = comments."postId"
+          LEFT JOIN users as u ON likes."userId" = u.id
+          LEFT JOIN followers f ON posts."userId"=f."followingId"
+
+          WHERE (f."userId"=$1 OR posts."userId"=$1)
+
+          GROUP BY
+                posts.id,
+                users.name,
+                users.image,
+                links.url,
+                links.title,
+                links.description,
+                links.image,
+                likes."postId"
+          ORDER BY id DESC
+          LIMIT 20
+        `,
+        [userId]
     );
 }
 
@@ -141,15 +185,6 @@ async function removePostFromComments(postId) {
     );
 }
 
-async function removePostFromReposts(postId) {
-    return connection.query(
-        `
-          DELETE FROM reposts
-          WHERE "postId"=$1`,
-        [postId]
-    );
-}
-
 async function removePost(postId) {
     return connection.query(
         `
@@ -172,18 +207,18 @@ async function getPostsByUserId(id) {
 }
 
 export {
-    checkLinkExists,
-    createLink,
-    selectNewLink,
-    updateLink,
-    createPost,
-    selectPosts,
-    checkPostExists,
-    updatePost,
-    removePost,
-    getPostsByUserId,
-    removePostFromHashtagsPosts,
-    removePostFromLikes,
-    removePostFromComments,
-    removePostFromReposts,
+  checkLinkExists,
+  createLink,
+  selectNewLink,
+  updateLink,
+  createPost,
+  selectPosts,
+  checkPostExists,
+  updatePost,
+  removePost,
+  getPostsByUserId,
+  removePostFromHashtagsPosts,
+  removePostFromLikes,
+  removePostFromComments,
+  selectPostsReposts,
 };
