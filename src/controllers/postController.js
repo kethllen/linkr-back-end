@@ -51,6 +51,9 @@ export async function publishPost(req, res) {
 }
 
 export async function getPosts(req, res) {
+   // const { offset } = req.query; Usado para o scroll infinito
+   // const { rows: posts } = await selectPosts(id, offset);Usado para o scroll infinito
+
   const { id } = res.locals.user;
 
   try {
@@ -106,7 +109,6 @@ export async function editPost(req, res) {
     if (postExists.rows[0].userId !== user.id) {
       return res.sendStatus(401);
     }
-
     await removePostFromHashtagsPosts(postId);
 
     const hashtagsMatched = text?.match(/#[a-z0-9_]+/g);

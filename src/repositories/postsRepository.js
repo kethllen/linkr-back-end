@@ -1,53 +1,53 @@
 import connection from "../database/database.js";
 
 async function checkLinkExists(url) {
-  return connection.query(
-    `
+    return connection.query(
+        `
   SELECT * 
   FROM links
   WHERE url=$1`,
-    [url]
-  );
+        [url]
+    );
 }
 
 async function createLink(url, title, description, image) {
-  return connection.query(
-    `
+    return connection.query(
+        `
             INSERT INTO links (url, title, description, image)
             VALUES ($1, $2, $3, $4)`,
-    [url, title, description, image]
-  );
+        [url, title, description, image]
+    );
 }
 
 async function selectNewLink(url) {
-  return connection.query(
-    `
+    return connection.query(
+        `
             SELECT * 
             FROM links
             WHERE url=$1`,
-    [url]
-  );
+        [url]
+    );
 }
 
 async function updateLink(title, description, image, url) {
-  return connection.query(
-    `
+    return connection.query(
+        `
             UPDATE links 
             SET title = $1, 
                 description = $2, 
                 image = $3
             WHERE url=$4`,
-    [title, description, image, url]
-  );
+        [title, description, image, url]
+    );
 }
 
 async function createPost(userId, text, linkId) {
-  return connection.query(
-    `
+    return connection.query(
+        `
           INSERT INTO posts ("userId",text,"linkId") 
           VALUES ($1, $2, $3)`,
-    [userId, text, linkId]
-  );
+        [userId, text, linkId]
+    );
 }
 async function selectPostsReposts(userId, postId) {
   return connection.query(
@@ -67,7 +67,7 @@ async function selectPostsReposts(userId, postId) {
               posts."repostQuantity",
               bool_and(CASE WHEN likes."userId" = $1 THEN true ELSE null END) AS "isLiked",
               (ARRAY_AGG(u."name"))[1:2] AS "userLiked"
-
+              
           FROM posts
           JOIN users ON users.id = posts."userId"
           JOIN links ON links.id = posts."linkId"
@@ -133,77 +133,77 @@ async function selectPosts(userId) {
           ORDER BY id DESC
           LIMIT 20
         `,
-    [userId]
-  );
+        [userId]
+    );
 }
 
 async function checkPostExists(postId) {
-  return connection.query(
-    `
+    return connection.query(
+        `
           SELECT * 
           FROM posts
           WHERE id=$1`,
-    [postId]
-  );
+        [postId]
+    );
 }
 
 async function updatePost(text, linkId, postId) {
-  return connection.query(
-    `
+    return connection.query(
+        `
           UPDATE posts
           SET text=$1,
               "linkId"=$2
           WHERE id=$3`,
-    [text, linkId, postId]
-  );
+        [text, linkId, postId]
+    );
 }
 
 async function removePostFromHashtagsPosts(postId) {
-  return connection.query(
-    `
+    return connection.query(
+        `
           DELETE FROM "hashtagsPosts"
           WHERE "postId"=$1`,
-    [postId]
-  );
+        [postId]
+    );
 }
 
 async function removePostFromLikes(postId) {
-  return connection.query(
-    `
+    return connection.query(
+        `
           DELETE FROM likes
           WHERE "postId"=$1`,
-    [postId]
-  );
+        [postId]
+    );
 }
 
 async function removePostFromComments(postId) {
-  return connection.query(
-    `
+    return connection.query(
+        `
           DELETE FROM comments
           WHERE "postId"=$1`,
-    [postId]
-  );
+        [postId]
+    );
 }
 
 async function removePost(postId) {
-  return connection.query(
-    `
+    return connection.query(
+        `
           DELETE FROM posts
           WHERE id=$1`,
-    [postId]
-  );
+        [postId]
+    );
 }
 
 async function getPostsByUserId(id) {
-  return connection.query(
-    `
+    return connection.query(
+        `
           SELECT p.id FROM posts p
             WHERE p."userId"=$1
             ORDER BY p.id DESC
             LIMIT 1
         `,
-    [id]
-  );
+        [id]
+    );
 }
 
 export {
