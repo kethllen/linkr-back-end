@@ -1,13 +1,13 @@
 import connection from "../database/database.js";
 
-async function getTableFollowers(){
+async function getTableFollowers() {
     return await connection.query(`
         SELECT * 
             FROM followers;
     `)
 };
 
-async function insertIntoFollowers(loggedUser, visitedUserId){
+async function insertIntoFollowers(loggedUser, visitedUserId) {
     return await connection.query(`
         INSERT INTO followers
             ("userId", "followingId")
@@ -16,7 +16,7 @@ async function insertIntoFollowers(loggedUser, visitedUserId){
     )
 };
 
-async function removeFromFollowers(loggedUser, visitedUserId){
+async function removeFromFollowers(loggedUser, visitedUserId) {
     return await connection.query(`
         DELETE FROM followers
             WHERE "userId"= $1 AND "followingId" = $2
@@ -24,7 +24,7 @@ async function removeFromFollowers(loggedUser, visitedUserId){
     )
 };
 
-async function verifyFollower(loggedUser, visitedUserId){
+async function verifyFollower(loggedUser, visitedUserId) {
     return await connection.query(`
         SELECT *
             FROM followers f
@@ -34,9 +34,18 @@ async function verifyFollower(loggedUser, visitedUserId){
     )
 };
 
-export{
+async function checkFollowersQuery(userId) {
+    return await connection.query(`
+        SELECT *
+        FROM followers
+        WHERE "userId"=$1
+    `, [userId])
+}
+
+export {
     verifyFollower,
     getTableFollowers,
     insertIntoFollowers,
-    removeFromFollowers
+    removeFromFollowers,
+    checkFollowersQuery
 };
