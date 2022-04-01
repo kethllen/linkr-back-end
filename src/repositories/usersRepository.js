@@ -4,7 +4,7 @@ async function selectUsers() {
   return await connection.query(
     `
       SELECT * FROM users
-      `
+    `
   );
 }
 
@@ -68,7 +68,6 @@ async function selectPostsById(userId, id) {
           likes."postId"
 
         ORDER BY id DESC
-        LIMIT 20
       `,
     [userId, id]
   );
