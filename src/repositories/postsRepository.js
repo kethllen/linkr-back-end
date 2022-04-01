@@ -51,7 +51,6 @@ async function createPost(userId, text, linkId) {
 }
 
 async function selectPosts(userId, offset) {
-    console.log(offset);
     return connection.query(
         `
         SELECT
@@ -87,7 +86,7 @@ async function selectPosts(userId, offset) {
             likes."postId"
 
         ORDER BY id DESC
-        LIMIT 5
+        LIMIT 10
         OFFSET $2
         `,
         [userId, offset]
