@@ -59,7 +59,7 @@ export async function getPosts(req, res) {
 
     for (let post of posts) {
       if (post?.repostId !== null) {
-        const { rows: originalPost } = await selectPostsReposts(post.repostId); // buscar
+        const { rows: originalPost } = await selectPostsReposts(id, post.repostId); // buscar
         const concatenar = {
           id: post.id,
           name: post.name,

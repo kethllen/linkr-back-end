@@ -49,7 +49,7 @@ async function createPost(userId, text, linkId) {
     [userId, text, linkId]
   );
 }
-async function selectPostsReposts(postId) {
+async function selectPostsReposts(userId, postId) {
   return connection.query(
     `SELECT
               posts.id,
@@ -75,7 +75,7 @@ async function selectPostsReposts(postId) {
           LEFT JOIN comments ON posts.id = comments."postId"
           LEFT JOIN users as u ON likes."userId" = u.id
 
-          WHERE posts.id=$1
+          WHERE posts.id=$2
 
           GROUP BY
                 posts.id,
@@ -88,7 +88,7 @@ async function selectPostsReposts(postId) {
                 likes."postId"
           ORDER BY id DESC
         `,
-    [postId]
+    [userId, postId]
   );
 }
 async function selectPosts(userId) {
