@@ -13,6 +13,7 @@ import {
     removePostFromLikes,
     removePostFromComments,
     selectPostsReposts,
+    removeAllReposts
 } from "../repositories/postsRepository.js";
 
 import {
@@ -175,6 +176,30 @@ export async function deletePost(req, res) {
             return res.sendStatus(401);
         }
 
+        // it's an original post
+        if (postExists.rows[0].repostId === null) {
+            await removePostFromHashtagsPosts(postId);
+            await removePostFromLikes(postId);
+            await removePostFromComments(postId);
+            await removeAllReposts(postId);
+            await removePost(postId);
+
+            return res.sendStatus(200);
+        }
+
+        const { repostId, repostQuantity } = postExists.rows[0]
+        // console.log(repostQuantity)
+        // console.log(typeof (repostQuantity))
+
+        await connection.query(
+            `
+            UPDATE posts
+            SET "repostQuantity"=$1
+            WHERE "id"=$2
+        `,
+            [repostQuantity - 1, repostId]
+        );
+
         await removePostFromHashtagsPosts(postId);
         await removePostFromLikes(postId);
         await removePostFromComments(postId);
@@ -182,6 +207,7 @@ export async function deletePost(req, res) {
 
         return res.sendStatus(200);
     } catch (error) {
+        console.log(error);
         return res.sendStatus(500);
     }
 }
