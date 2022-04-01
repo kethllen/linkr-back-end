@@ -91,7 +91,7 @@ async function selectPostsReposts(userId, postId) {
         [userId, postId]
     );
 }
-async function selectPosts(userId, offset) {
+async function selectPosts(userId, offset, hasNoLimit) {
     return connection.query(
         `
           SELECT
@@ -131,7 +131,7 @@ async function selectPosts(userId, offset) {
                 links.image,
                 likes."postId"
           ORDER BY id DESC
-          LIMIT 10
+          ${hasNoLimit ? "" : "LIMIT 10"}
           OFFSET $2
         `,
         [userId, offset]
