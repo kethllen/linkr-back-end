@@ -3,6 +3,7 @@ import {
   selectPostsById,
   selectSingleUser,
   selectUsers,
+  selectPostsRepostsById,
 } from "../repositories/usersRepository.js";
 
 export async function getUsers(req, res) {
@@ -39,13 +40,53 @@ export async function getUserById(req, res) {
 
 export async function getPostsById(req, res) {
   try {
-    const { offset } = req.query;
     const { user } = res.locals;
     const { id } = req.params;
+    const { offset } = req.query;
+    console.log(offset);
+    let newOffset = 0;
+    if (offset) {
+      newOffset = offset;
+    }
+    const { rows: posts } = await selectPostsById(user.id, id, newOffset);
+    let retorno = [];
 
-    const posts = await selectPostsById(user.id, id, offset);
-    return res.status(200).send(posts.rows);
+    for (let post of posts) {
+      if (post?.repostId !== null) {
+        const { rows: originalPost } = await selectPostsRepostsById(
+          id,
+          post?.repostId
+        );
+
+        const concatenar = {
+          id: post?.id,
+          name: post?.name,
+          userId: post?.userId,
+          repostId: post?.repostId,
+          idUserPost: originalPost[0]?.userId,
+          namePost: originalPost[0]?.name,
+          image: originalPost[0]?.image,
+          url: originalPost[0]?.url,
+          title: originalPost[0]?.title,
+          text: originalPost[0]?.text,
+          description: originalPost[0]?.description,
+          linkImage: originalPost[0]?.linkImage,
+          likeQuantity: originalPost[0]?.likeQuantity,
+          commentQuantity: originalPost[0]?.commentQuantity,
+          repostQuantity: originalPost[0]?.repostQuantity,
+          isLiked: originalPost[0]?.isLiked,
+          userLiked: originalPost[0]?.userLiked,
+        };
+
+        retorno.push(concatenar);
+      } else {
+        retorno.push(post);
+      }
+    }
+
+    return res.status(200).send(retorno);
   } catch (error) {
+    console.log(error);
     return res.sendStatus(500);
   }
 }
