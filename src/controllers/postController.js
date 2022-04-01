@@ -54,10 +54,11 @@ export async function publishPost(req, res) {
 
 export async function getPosts(req, res) {
     const { offset } = req.query;
+    const { noLimit } = req.query;
     const { id } = res.locals.user;
 
     try {
-        const { rows: posts } = await selectPosts(id, offset);
+        const { rows: posts } = await selectPosts(id, offset, noLimit);
         let retorno = [];
 
         for (let post of posts) {
