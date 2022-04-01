@@ -1,10 +1,17 @@
 import connection from "../database/database.js";
 
-async function selectUsers() {
+async function selectUsers(id) {
   return await connection.query(
     `
-      SELECT * FROM users
-      `
+    SELECT
+    users.*,
+   bool_and(CASE WHEN followers."userId"=$1 THEN true ELSE null END) AS "isFollowing"
+FROM users
+LEFT JOIN followers ON users.id=followers."followingId"
+GROUP BY
+    users.id
+      `,
+    [id]
   );
 }
 
