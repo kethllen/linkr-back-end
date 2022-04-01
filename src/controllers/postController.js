@@ -20,6 +20,7 @@ import {
     getHashtagByName,
     connectHashtagWithPost,
 } from "../repositories/hashtagsRepository.js";
+import connection from "../database/database.js";
 
 export async function publishPost(req, res) {
     try {
@@ -208,9 +209,9 @@ export async function repostPost(req, res) {
             `
             UPDATE posts
             SET "repostQuantity"=$1
-            WHERE "repostId"=$2
+            WHERE "id"=$2 
         `,
-            [repostQuantity + 1, postId]
+            [repostQuantity + 1, id]
         );
 
         await connection.query(
