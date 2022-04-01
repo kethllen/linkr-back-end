@@ -4,8 +4,10 @@ async function selectUsers() {
     return await connection.query(
         `
       SELECT * FROM users
-      `
-    );
+
+    `
+  );
+
 }
 
 async function selectSingleUser(token) {
@@ -68,8 +70,9 @@ async function selectPostsById(userId, id, offset) {
           likes."postId"
 
         ORDER BY id DESC
-            LIMIT 10
-            OFFSET $3
+         LIMIT 10
+         OFFSET $3
+
       `,
         [userId, id, offset]
     );
