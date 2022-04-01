@@ -20,11 +20,34 @@ async function toggleFollowingUser(req, res) {
 
         if (isFollowingUser.rowCount) {
             await removeFromFollowers(id, visitedUserId);
+            console.log('acho que foi tambem')
         } else {
+            
             await insertIntoFollowers(id, visitedUserId);
         };
 
         return res.sendStatus(200);
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    };
+};
+
+async function verifyIfIsCurrentFollower(req, res) {
+    const { id } = res.locals.user;
+    const { visitedUserId } = req.params;
+    let response = "";
+
+    try {
+        const isFollowingUser = await verifyFollower(id, visitedUserId);
+        
+        if(isFollowingUser.rowCount > 0){
+            response = 'Unfollow'    
+        } else {
+            response = 'Follow'
+        }
+        
+        return res.status(200).send(response)
     } catch (error) {
         console.log(error);
         return res.sendStatus(500);
@@ -46,5 +69,6 @@ async function checkFollowers(req, res) {
 export {
     getFollowers,
     toggleFollowingUser,
-    checkFollowers
+    checkFollowers,
+    verifyIfIsCurrentFollower
 };
