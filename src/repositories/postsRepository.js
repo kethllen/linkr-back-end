@@ -119,7 +119,7 @@ async function selectPosts(userId) {
           LEFT JOIN users as u ON likes."userId" = u.id
           LEFT JOIN followers f ON posts."userId"=f."followingId"
 
-          WHERE f."userId"=$1
+          WHERE (f."userId"=$1 OR posts."userId"=$1)
 
           GROUP BY
                 posts.id,
