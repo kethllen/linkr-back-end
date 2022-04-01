@@ -1,8 +1,8 @@
-import { verifyFollower, getTableFollowers, insertIntoFollowers, removeFromFollowers } from "../repositories/followersRepository.js";
+import { verifyFollower, getTableFollowers, insertIntoFollowers, removeFromFollowers, checkFollowersQuery } from "../repositories/followersRepository.js";
 
-async function getFollowers(req,res){
+async function getFollowers(req, res) {
     try {
-        const {rows: response} = await getTableFollowers();
+        const { rows: response } = await getTableFollowers();
         res.status(200).send(response)
 
     } catch (error) {
@@ -11,19 +11,19 @@ async function getFollowers(req,res){
     }
 };
 
-async function toggleFollowingUser(req, res){
+async function toggleFollowingUser(req, res) {
     const { id } = res.locals.user;
     const { visitedUserId } = req.params;
 
-    try{
+    try {
         const isFollowingUser = await verifyFollower(id, visitedUserId);
-        
-        if(isFollowingUser.rowCount){
+
+        if (isFollowingUser.rowCount) {
             await removeFromFollowers(id, visitedUserId);
         } else {
             await insertIntoFollowers(id, visitedUserId);
         };
-        
+
         return res.sendStatus(200);
     } catch (error) {
         console.log(error);
@@ -31,7 +31,20 @@ async function toggleFollowingUser(req, res){
     };
 };
 
+async function checkFollowers(req, res) {
+    const { id } = res.locals.user;
+    try {
+        const followers = await checkFollowersQuery(id);
+
+        return res.status(200).send(followers.rows)
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    };
+}
+
 export {
     getFollowers,
-    toggleFollowingUser
+    toggleFollowingUser,
+    checkFollowers
 };

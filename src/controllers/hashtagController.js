@@ -46,8 +46,9 @@ async function getHashtags(req, res) {
 async function getPostsWithHashtag(req, res) {
     const { id } = res.locals.user;
     const hashtag = req.params.hashtag;
+    const { offset } = req.query;
     try {
-        const result = await getPostsWithHashtagName(id, hashtag);
+        const result = await getPostsWithHashtagName(id, hashtag, offset);
         return res.status(200).send(result.rows);
     } catch (error) {
         console.log(error);
