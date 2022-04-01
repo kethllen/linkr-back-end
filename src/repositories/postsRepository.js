@@ -50,8 +50,8 @@ async function createPost(userId, text, linkId) {
     );
 }
 async function selectPostsReposts(userId, postId) {
-  return connection.query(
-    `SELECT
+    return connection.query(
+        `SELECT
               posts.id,
               posts.text,
               posts."userId" as "userId",
@@ -88,12 +88,12 @@ async function selectPostsReposts(userId, postId) {
                 likes."postId"
           ORDER BY id DESC
         `,
-    [userId, postId]
-  );
+        [userId, postId]
+    );
 }
-async function selectPosts(userId) {
-  return connection.query(
-    `
+async function selectPosts(userId, offset) {
+    return connection.query(
+        `
           SELECT
               posts.id,
               posts.text,
@@ -131,9 +131,10 @@ async function selectPosts(userId) {
                 links.image,
                 likes."postId"
           ORDER BY id DESC
-          LIMIT 20
+          LIMIT 10
+          OFFSET $2
         `,
-        [userId]
+        [userId, offset]
     );
 }
 
@@ -207,18 +208,18 @@ async function getPostsByUserId(id) {
 }
 
 export {
-  checkLinkExists,
-  createLink,
-  selectNewLink,
-  updateLink,
-  createPost,
-  selectPosts,
-  checkPostExists,
-  updatePost,
-  removePost,
-  getPostsByUserId,
-  removePostFromHashtagsPosts,
-  removePostFromLikes,
-  removePostFromComments,
-  selectPostsReposts,
+    checkLinkExists,
+    createLink,
+    selectNewLink,
+    updateLink,
+    createPost,
+    selectPosts,
+    checkPostExists,
+    updatePost,
+    removePost,
+    getPostsByUserId,
+    removePostFromHashtagsPosts,
+    removePostFromLikes,
+    removePostFromComments,
+    selectPostsReposts,
 };
