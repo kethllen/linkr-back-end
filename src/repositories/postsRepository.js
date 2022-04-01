@@ -207,6 +207,14 @@ async function getPostsByUserId(id) {
     );
 }
 
+async function removeAllReposts(postId) {
+    return connection.query(`
+        DELETE FROM posts
+        WHERE "repostId"=$1
+    `, [postId]
+    );
+}
+
 export {
     checkLinkExists,
     createLink,
@@ -222,4 +230,5 @@ export {
     removePostFromLikes,
     removePostFromComments,
     selectPostsReposts,
+    removeAllReposts
 };
